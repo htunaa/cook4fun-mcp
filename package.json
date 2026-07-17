@@ -1,0 +1,41 @@
+{
+  "name": "cook4fun-mcp",
+  "version": "0.1.0",
+  "description": "MCP server that lets any MCP-compatible agent launch and trade coins on cook4.fun (Robinhood chain).",
+  "type": "module",
+  "bin": {
+    "cook4fun-mcp": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "cook4fun",
+    "robinhood-chain",
+    "launchpad",
+    "defi",
+    "agent"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.js",
+    "prepare": "tsup",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "viem": "^2.21.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.4.0"
+  }
+}
