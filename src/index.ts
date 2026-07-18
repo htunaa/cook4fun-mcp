@@ -4,7 +4,7 @@ import { z } from "zod";
 import { formatEther, parseEther, parseUnits, decodeEventLog, type Address } from "viem";
 import { getConfig, requireWallet } from "./chain.js";
 import { ERC20_ABI, LAUNCHPAD_ABI } from "./contracts.js";
-import { applySlippage, explorerTx, fetchTokens, fmtEth, resolveToken } from "./utils.js";
+import { applySlippage, explorerTx, fetchTokens, fmtEth, pinMetadata, resolveToken } from "./utils.js";
 
 const TOKEN_CREATED_ABI = [
   {
@@ -112,6 +112,24 @@ server.registerTool(
       const cfg = getConfig();
       requireWallet(cfg);
       const firstBuy = a.firstBuyEth ? parseEther(a.firstBuyEth) : 0n;
+
+      // Pin the metadata JSON (ERC-7572) unless the caller supplied one.
+      // Terminals read the coin's picture and socials from this; launching
+      // without it leaves contractURI empty and the coin shows up with no
+      // image anywhere. cook4.fun also copies the image onto IPFS here.
+      let metadataUrl = a.metadataUrl ?? "";
+      if (!metadataUrl) {
+        metadataUrl = await pinMetadata(cfg.apiBase, {
+          name: a.name,
+          symbol: a.symbol.toUpperCase(),
+          description: a.description ?? "",
+          image: a.image ?? "",
+          twitter: a.twitter ?? "",
+          telegram: a.telegram ?? "",
+          website: a.website ?? "",
+        });
+      }
+
       const creationFee = (await cfg.publicClient.readContract({
         address: cfg.launchpad,
         abi: LAUNCHPAD_ABI,
@@ -134,7 +152,7 @@ server.registerTool(
           a.website ?? "",
           a.distribute ?? false,
           firstBuy,
-          a.metadataUrl ?? "",
+          metadataUrl,
         ],
         value,
         account: cfg.account,

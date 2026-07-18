@@ -4,3 +4,7 @@ dist
 .env
 .env.*
 .DS_Store
+
+# Local scratch scripts and wallet keys: never commit these
+wallets.json
+*.mjs

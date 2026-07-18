@@ -22,6 +22,8 @@ export type Config = {
   launchpad: Address;
   rpcUrl: string;
   slippageBps: bigint;
+  /** cook4.fun origin used to pin token metadata (ERC-7572) at launch. */
+  apiBase: string;
 };
 
 function normalizePrivateKey(pk: string): `0x${string}` {
@@ -64,7 +66,9 @@ export function getConfig(): Config {
     walletClient = createWalletClient({ account, chain, transport: http(rpcUrl) });
   }
 
-  return { publicClient, walletClient, account, launchpad, rpcUrl, slippageBps };
+  const apiBase = (process.env.COOK4FUN_API_URL || "https://cook4.fun").replace(/\/+$/, "");
+
+  return { publicClient, walletClient, account, launchpad, rpcUrl, slippageBps, apiBase };
 }
 
 /** Throws a friendly error if no wallet is configured (for write tools). */

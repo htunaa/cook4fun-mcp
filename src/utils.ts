@@ -69,6 +69,40 @@ export function fmtEth(wei: bigint, digits = 5): string {
   return `${n.toFixed(digits).replace(/\.?0+$/, "")} ETH`;
 }
 
+export type TokenMetadata = {
+  name: string;
+  symbol: string;
+  description?: string;
+  image?: string;
+  twitter?: string;
+  telegram?: string;
+  website?: string;
+};
+
+/**
+ * Pin the coin's metadata JSON (ERC-7572) via cook4.fun and return the URL to
+ * store on-chain as `md`. Terminals read the coin's picture and socials from
+ * this, NOT from the launchpad's imageUrl field, so a launch without it shows
+ * up with no image anywhere. cook4.fun also copies a remotely hosted image onto
+ * IPFS here, so the picture outlives whatever host the caller used.
+ *
+ * Returns "" on any failure: a missing picture should never block a launch.
+ */
+export async function pinMetadata(apiBase: string, meta: TokenMetadata): Promise<string> {
+  try {
+    const res = await fetch(`${apiBase}/api/metadata`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(meta),
+    });
+    if (!res.ok) return "";
+    const json: any = await res.json();
+    return typeof json?.uri === "string" ? json.uri : "";
+  } catch {
+    return "";
+  }
+}
+
 export function explorerTx(hash: string): string {
   return `https://blockscout.mainnet.chain.robinhood.com/tx/${hash}`;
 }
