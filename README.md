@@ -2,7 +2,7 @@
 
 # cook4fun-mcp
 
-An [MCP](https://modelcontextprotocol.io) server that lets any MCP-compatible agent **launch and trade coins on [cook4.fun](https://cook4.fun)**, a Uniswap-V3-native launchpad on the Robinhood chain (chainId `4663`).
+An [MCP](https://modelcontextprotocol.io) server that lets any MCP-compatible agent **launch and trade coins on [cook4.fun](https://cook4.fun)**, a Uniswap-V4-native launchpad on the Robinhood chain (chainId `4663`).
 
 It runs **locally** on your own machine (stdio transport), signs with your own wallet, and talks straight to the chain. There is no hosted service and nothing to pay for: your client (Claude Desktop, Cursor, Cline, Windsurf, and other MCP clients) starts it on demand.
 
@@ -12,7 +12,7 @@ It runs **locally** on your own machine (stdio transport), signs with your own w
 |---|---|---|
 | `cook4fun_list_coins` | List the newest coins with market caps | no |
 | `cook4fun_wallet` | Show the trading wallet address and ETH balance | yes |
-| `cook4fun_launch` | Launch a new coin (deploys token + opens its V3 pool, optional first buy) | yes |
+| `cook4fun_launch` | Launch a new coin (deploys token + opens its V4 pool, optional first buy) | yes |
 | `cook4fun_buy` | Buy a coin with ETH (slippage-protected) | yes |
 | `cook4fun_sell` | Sell a coin back to ETH by amount, percentage, or all (auto-approves) | yes |
 | `cook4fun_claim` | Claim reward-sharing fees | yes |

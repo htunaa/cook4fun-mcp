@@ -18,6 +18,15 @@ export const LAUNCHPAD_ABI = [
       { name: "_distribute", type: "bool" },
       { name: "_firstBuy", type: "uint256" },
       { name: "md", type: "string" },
+      { name: "salt", type: "bytes32" },
+      {
+        name: "sp",
+        type: "tuple[]",
+        components: [
+          { name: "to", type: "address" },
+          { name: "bps", type: "uint16" },
+        ],
+      },
     ],
     outputs: [{ name: "", type: "address" }],
   },
@@ -112,10 +121,10 @@ export const LAUNCHPAD_ABI = [
           { name: "telegram", type: "string" },
           { name: "website", type: "string" },
           { name: "createdAt", type: "uint256" },
-          { name: "graduated", type: "bool" },
-          { name: "pool", type: "address" },
-          { name: "positionId", type: "uint256" },
-          { name: "wethIsToken0", type: "bool" },
+          { name: "poolId", type: "bytes32" },
+          { name: "tickLower", type: "int24" },
+          { name: "tickUpper", type: "int24" },
+          { name: "liquidity", type: "uint128" },
           { name: "distribute", type: "bool" },
           { name: "hfp", type: "uint256" },
           { name: "fpta", type: "uint256" },
@@ -170,9 +179,14 @@ export const ERC20_ABI = [
   },
 ] as const;
 
-// Live V2 launchpad (ERC-7572 on-chain metadata). New launches go here.
+// Live V4-native launchpad (Uniswap V4 + EIP-1167 clone tokens). New launches go here.
 export const DEFAULT_LAUNCHPAD_ADDRESS =
-  "0xc12F4cc3d6a1a91B03827632C4D744454350A352" as const;
+  "0xcdC8D6C3DdA334730262Fd7D7f0Ee5E86bA4Ff47" as const;
+
+// The LaunchpadToken implementation every coin is a clone of. Used to derive a
+// coin's CREATE2 address off-chain when grinding a c00c vanity salt.
+export const DEFAULT_TOKEN_IMPLEMENTATION =
+  "0x4CcfcAad121f7082cee86ee76D76f24F7Cd35720" as const;
 
 // Robinhood chain.
 export const DEFAULT_CHAIN_ID = 4663;

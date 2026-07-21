@@ -3,8 +3,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { formatEther, parseEther, parseUnits, decodeEventLog, type Address } from "viem";
 import { getConfig, requireWallet } from "./chain.js";
-import { ERC20_ABI, LAUNCHPAD_ABI } from "./contracts.js";
-import { applySlippage, explorerTx, fetchTokens, fmtEth, pinMetadata, resolveToken } from "./utils.js";
+import { DEFAULT_TOKEN_IMPLEMENTATION, ERC20_ABI, LAUNCHPAD_ABI } from "./contracts.js";
+import { applySlippage, explorerTx, fetchTokens, fmtEth, grindSalt, pinMetadata, resolveToken } from "./utils.js";
 
 const TOKEN_CREATED_ABI = [
   {
@@ -93,7 +93,7 @@ server.registerTool(
   {
     title: "Launch a coin",
     description:
-      "Launch a new coin on cook4.fun: deploys the token, opens its Uniswap V3 pool, and optionally makes a first buy. Requires a wallet with ETH.",
+      "Launch a new coin on cook4.fun: deploys the token, opens its Uniswap V4 pool, and optionally makes a first buy. Requires a wallet with ETH.",
     inputSchema: {
       name: z.string().min(1).describe("Coin name, e.g. \"Space Cat\""),
       symbol: z.string().min(1).max(12).describe("Ticker, e.g. SCAT"),
@@ -138,6 +138,10 @@ server.registerTool(
       })) as bigint;
       const value = creationFee + firstBuy;
 
+      // Grind a c00c vanity salt (the sender is mixed in on-chain, so this only
+      // resolves for us). Empty split: the agent keeps its whole 75% creator fee.
+      const salt = grindSalt(cfg.account.address, cfg.launchpad, DEFAULT_TOKEN_IMPLEMENTATION);
+
       const hash = await cfg.walletClient.writeContract({
         address: cfg.launchpad,
         abi: LAUNCHPAD_ABI,
@@ -153,6 +157,8 @@ server.registerTool(
           a.distribute ?? false,
           firstBuy,
           metadataUrl,
+          salt,
+          [],
         ],
         value,
         account: cfg.account,
