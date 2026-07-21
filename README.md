@@ -47,7 +47,7 @@ Restart the client and the `cook4fun_*` tools appear.
 |---|---|---|---|
 | `COOK4FUN_PRIVATE_KEY` | for trading | none | Wallet private key (`0x…`, 32 bytes). Needs ETH on chain 4663 for launch fee, gas, and buys. Read-only tools work without it. |
 | `COOK4FUN_RPC_URL` | no | `https://rpc.mainnet.chain.robinhood.com` | Custom RPC endpoint. |
-| `COOK4FUN_LAUNCHPAD_ADDRESS` | no | `0xc12F…A352` (live V2) | Override the launchpad contract. |
+| `COOK4FUN_LAUNCHPAD_ADDRESS` | no | `0xcdC8…Ff47` (live V4) | Override the launchpad contract. |
 | `COOK4FUN_SLIPPAGE_BPS` | no | `1000` (10%) | Default slippage tolerance for buys/sells, in basis points. |
 
 > ⚠️ Security: the server can spend everything in this wallet. Fund it with only what you want the agent to trade, and treat the key like any other secret. The key stays on your machine; it is never sent anywhere except to sign transactions locally.
