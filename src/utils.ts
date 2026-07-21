@@ -133,18 +133,31 @@ export type TokenMetadata = {
  *
  * Returns "" on any failure: a missing picture should never block a launch.
  */
-export async function pinMetadata(apiBase: string, meta: TokenMetadata): Promise<string> {
+/**
+ * Pins the coin's metadata JSON and returns both its URI and the FINAL image URL.
+ * The endpoint copies a remote image onto our IPFS gateway, so `image` is the
+ * durable copy — the launch writes that on-chain, not the raw link the agent
+ * gave (a temporary image host can go dead, and the site reads the coin's
+ * picture from the on-chain field).
+ */
+export async function pinMetadata(
+  apiBase: string,
+  meta: TokenMetadata,
+): Promise<{ uri: string; image: string }> {
   try {
     const res = await fetch(`${apiBase}/api/metadata`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(meta),
     });
-    if (!res.ok) return "";
+    if (!res.ok) return { uri: "", image: "" };
     const json: any = await res.json();
-    return typeof json?.uri === "string" ? json.uri : "";
+    return {
+      uri: typeof json?.uri === "string" ? json.uri : "",
+      image: typeof json?.image === "string" ? json.image : "",
+    };
   } catch {
-    return "";
+    return { uri: "", image: "" };
   }
 }
 

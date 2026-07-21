@@ -98,7 +98,7 @@ server.registerTool(
       name: z.string().min(1).describe("Coin name, e.g. \"Space Cat\""),
       symbol: z.string().min(1).max(12).describe("Ticker, e.g. SCAT"),
       description: z.string().optional(),
-      image: z.string().optional().describe("Image URL (https or ipfs://)"),
+      image: z.string().optional().describe("Any public image URL (https or ipfs://). cook4.fun copies it onto IPFS and pins it, so a temporary host is fine — you don't need to host it permanently yourself."),
       twitter: z.string().optional(),
       telegram: z.string().optional(),
       website: z.string().optional(),
@@ -118,8 +118,11 @@ server.registerTool(
       // without it leaves contractURI empty and the coin shows up with no
       // image anywhere. cook4.fun also copies the image onto IPFS here.
       let metadataUrl = a.metadataUrl ?? "";
+      // Default the on-chain image to whatever was passed, then upgrade it to the
+      // pinned copy below so it outlives the caller's (often temporary) host.
+      let imageUrl = a.image ?? "";
       if (!metadataUrl) {
-        metadataUrl = await pinMetadata(cfg.apiBase, {
+        const pinned = await pinMetadata(cfg.apiBase, {
           name: a.name,
           symbol: a.symbol.toUpperCase(),
           description: a.description ?? "",
@@ -128,6 +131,8 @@ server.registerTool(
           telegram: a.telegram ?? "",
           website: a.website ?? "",
         });
+        metadataUrl = pinned.uri;
+        if (pinned.image) imageUrl = pinned.image; // durable IPFS copy
       }
 
       const creationFee = (await cfg.publicClient.readContract({
@@ -150,7 +155,7 @@ server.registerTool(
           a.name,
           a.symbol.toUpperCase(),
           a.description ?? "",
-          a.image ?? "",
+          imageUrl,
           a.twitter ?? "",
           a.telegram ?? "",
           a.website ?? "",
